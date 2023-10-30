@@ -4,12 +4,17 @@ let gBAHeight = 20;
 let gBAWidth = 12;
 let startX = 4;
 let startY = 0;
+let score=0;
+let level=1;
+let winOrLose="Playing";
 let coordArray = [...Array(gBAHeight)].map(e => Array(gBAWidth).fill(0));
 let curTetramino = [[1,0],[0,1],[1,1],[2,1]];
 let tetraminos = [];
 let tColors= ['purple','cyan','orange','red','green','blue','yellow']
 let curTColor;
 let gBArray = [...Array(gBAHeight)].map(e=> Array(gBAWidth).fill(0));
+let stoppedShapeArray = [...Array(gBAHeight)].map(e => Array(gBAWidth).fill(0));
+let logo;
 let DIRECTION = {
     IDLE:0,
     DOWN:1,
@@ -54,12 +59,45 @@ function SetupCanvas(){
     ctx.strokeStyle = 'black';
     ctx.strokeRect(8,8,280,462);
 
+    logo = new Image(161,54);
+    logo.onload=DrawLogo;
+    logo.src="tetris.png";
+
+    ctx.fillStyle='black';
+    ctx.font ='21px Arial';
+
+    ctx.fillText("SCORE",300,98);
+    ctx.strokeRect(300,107,161,24);
+    ctx.fillText(score.toString(),310,127);
+
+    ctx.fillText("LEVEL",300,157);
+    ctx.strokeRect(300,171,161,24);
+    ctx.fillText(level.toString(),310,190)
+
+    ctx.fillText("Gewonnen / Verloren", 300,221);
+    ctx.fillText(winOrLose,310,261,);
+    ctx.strokeRect(300,232,161,95);
+
+    ctx.fillText("Steuerung",300,354);
+    ctx.strokeRect(300,366,161,104);
+    ctx.font = '19px Arial';
+    ctx.fillText("A: Links",310,388);
+    ctx.fillText("D: Rechts",310,413);
+    ctx.fillText("S: Runter",310,438);
+    ctx.fillText("E: Drehen",310,463);
+
+
+
     document.addEventListener('keydown',keypress);
     CreateTetraminos();
     CreateTetramino();
 
     CreateCArray();
     DrawTM();
+}
+
+function DrawLogo(){
+    ctx.drawImage(logo,300,8,161,54);
 }
 
 function DrawTM(){
@@ -75,21 +113,34 @@ function DrawTM(){
 }
 
 function keypress(key){
-    if(key.keyCode===65){
-        direction = DIRECTION.LEFT;
-        DeleteT();
-        startX--;
-        DrawTM();
-    }else if(key.keyCode===68){
-        direction=DIRECTION.RiGHT;
-        DeleteT();
-        startX++;
-        DrawTM();
-    }else if(key.keyCode===83){
-        direction=DIRECTION.DOWN;
-        DeleteT();
-        startY++;
-        DrawTM();
+  if(winOrLose != "Verloren"){
+
+      if(key.keyCode===65){
+          direction = DIRECTION.LEFT;
+          if(!wallCollision()&& !CheckForHorizontalCollision()){
+              DeleteT();
+              startX--;
+              DrawTM();
+            }
+        }else if(key.keyCode===68){
+            direction=DIRECTION.RiGHT;
+            if(!wallCollision()&& !CheckForHorizontalCollision()){
+                DeleteT();
+                startX++;
+                DrawTM();
+            }
+        }else if(key.keyCode===83){
+            tmDown();
+        }
+    }
+}
+
+function tmDown(){
+   if(!CheckForVerticalCollision()){
+       direction=DIRECTION.DOWN;
+       DeleteT();
+       startY++;
+       DrawTM();
     }
 }
 
@@ -139,3 +190,8 @@ function wallCollision(){
     }
     return false;
 }
+
+function CheckForVerticalCollision(){
+    
+}
+
